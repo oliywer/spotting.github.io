@@ -273,6 +273,18 @@ body{
     </div>
   </div>
 
+  <div id="pwPanel" class="panel hidden">
+    <h2>ZMENA HESLA</h2>
+    <div class="form-grid">
+      <div class="field"><label>Nové heslo (min. 6 znakov)</label><input type="password" id="pw_new" autocomplete="new-password"></div>
+      <div class="field"><label>Nové heslo znova</label><input type="password" id="pw_new2" autocomplete="new-password"></div>
+    </div>
+    <div class="form-actions">
+      <button id="btnPwCancel" class="btn btn--ghost">Zrušiť</button>
+      <button id="btnPwSave" class="btn btn--amber">Uložiť heslo</button>
+    </div>
+  </div>
+
   <div id="thanksPanel" class="panel hidden">
     <h2>ĎAKUJEME</h2>
     <p>Pozorovanie je zverejnené v galérii. XP a kartu lietadla nájdeš v záložke Moja zbierka.</p>
@@ -791,6 +803,20 @@ $('btnLoginSubmit').addEventListener('click', async () => {
 });
 ['l_email','l_password','l_name'].forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') $('btnLoginSubmit').click(); }));
 
+$('btnPwCancel').addEventListener('click', () => { $('pwPanel').classList.add('hidden'); $('pw_new').value = ''; $('pw_new2').value = ''; });
+$('btnPwSave').addEventListener('click', async () => {
+  const a = $('pw_new').value, b = $('pw_new2').value;
+  if(a.length < 6){ toast('Heslo musí mať aspoň 6 znakov.'); return; }
+  if(a !== b){ toast('Heslá sa nezhodujú.'); return; }
+  $('btnPwSave').disabled = true;
+  const { error } = await sb.auth.updateUser({ password: a });
+  $('btnPwSave').disabled = false;
+  if(error){ toast('Zmena hesla zlyhala: ' + error.message, 5000); return; }
+  $('pw_new').value = ''; $('pw_new2').value = '';
+  $('pwPanel').classList.add('hidden');
+  toast('Heslo bolo zmenené.', 3000);
+});
+
 async function logout(){
   await sb.auth.signOut();
   toast('Odhlásený.', 1200);
@@ -807,7 +833,8 @@ function updateAuthUI(){
   if(currentUser){
     const name = myProfile ? myProfile.display_name : currentUser.email;
     const lv = myProfile ? ` · Lv ${levelInfo(myProfile.xp).level} · ${myProfile.xp} XP` : '';
-    $('authArea').innerHTML = `${isAdmin ? '<span class="badge">ADMIN</span>' : ''}${escapeHtml(name)}${lv} · <span class="link" id="authToggle">Odhlásiť</span>`;
+    $('authArea').innerHTML = `${isAdmin ? '<span class="badge">ADMIN</span>' : ''}${escapeHtml(name)}${lv} · <span class="link" id="pwToggle">Zmeniť heslo</span> · <span class="link" id="authToggle">Odhlásiť</span>`;
+    $('pwToggle').addEventListener('click', () => { $('pwPanel').classList.toggle('hidden'); $('pw_new').focus(); });
   }else{
     $('authArea').innerHTML = `<span class="link" id="authToggle">Prihlásiť / Registrovať</span>`;
   }
@@ -838,6 +865,7 @@ async function applySession(session){
 sb.auth.onAuthStateChange((event, session) => {
   // odložené, aby sa nezasekli volania supabase vo vnútri callbacku
   setTimeout(() => applySession(session), 0);
+  if(event === 'PASSWORD_RECOVERY') setTimeout(() => { $('pwPanel').classList.remove('hidden'); toast('Nastav si nové heslo.', 4000); }, 300);
 });
 
 /* ---------- tabs ---------- */
