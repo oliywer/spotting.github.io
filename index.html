@@ -646,7 +646,7 @@ async function submitNew(reg, type){
   let frPath = null;
 
   if(frShotBlob){
-    frPath = `${sightingId}/frshot.jpg`;
+    frPath = `${sightingId}/fr_${crypto.randomUUID()}.jpg`;
     const { error: frUpErr } = await sb.storage.from(BUCKET).upload(frPath, frShotBlob, { contentType: 'image/jpeg' });
     if(frUpErr) throw frUpErr;
   }
@@ -858,12 +858,13 @@ async function applySession(session){
   currentUser = session ? session.user : null;
   await loadMyProfile();
   updateAuthUI();
-  render();
+  await loadGallery();
   if(currentView === 'collection') loadCollection();
 }
 
 sb.auth.onAuthStateChange((event, session) => {
   // odložené, aby sa nezasekli volania supabase vo vnútri callbacku
+  if(event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') return;
   setTimeout(() => applySession(session), 0);
   if(event === 'PASSWORD_RECOVERY') setTimeout(() => { $('pwPanel').classList.remove('hidden'); toast('Nastav si nové heslo.', 4000); }, 300);
 });
@@ -1040,7 +1041,8 @@ function mapRow(row){
 async function loadGallery(){
   $('galleryList').innerHTML = '<div class="loading">Načítavam pozorovania...</div>';
   $('empty').classList.add('hidden');
-  const { data, error } = await sb.from('sightings').select('*, sighting_photos(*)').eq('status', 'approved').order('created_at', { ascending: false });
+  const cols = currentUser ? '*' : 'id,created_at,date,time,category,reg,type,operator,flight_no,route,notes,status,user_id';
+  const { data, error } = await sb.from('sightings').select(cols + ', sighting_photos(*)').eq('status', 'approved').order('created_at', { ascending: false });
   if(error){ toast('Chyba pri načítaní galérie: ' + error.message); $('galleryList').innerHTML = ''; return; }
   state.entries = (data || []).map(mapRow);
   renderStats();
@@ -1092,6 +1094,7 @@ function render(){
   const curLoc = $('filterLoc').value;
   $('filterLoc').innerHTML = '<option value="">Všetky lokality</option>' + locs.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
   $('filterLoc').value = locs.includes(curLoc) ? curLoc : '';
+  $('filterLoc').style.display = currentUser ? '' : 'none';
   $('locationOptions').innerHTML = locs.map(l => `<option value="${escapeHtml(l)}"></option>`).join('');
 
   const types = [...new Set(state.entries.map(e => e.type).filter(Boolean))].sort();
@@ -1235,7 +1238,6 @@ $('lightboxNext').addEventListener('click', () => { if(lightboxState) openLightb
 
 /* ---------- init ---------- */
 renderPhotoRows();
-loadGallery();
 sb.auth.getSession().then(({ data }) => applySession(data.session));
 </script>
 </body>
