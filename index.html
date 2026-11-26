@@ -309,7 +309,7 @@ body{
     <p class="form-note"><span class="req">*</span> povinné údaje</p>
     <div class="form-grid">
       <div class="field"><label>Registrácia lietadla <span class="req">*</span></label><input type="text" id="f_reg" placeholder="napr. OK-ABC" maxlength="12"></div>
-      <div class="field"><label>Typ lietadla <span class="req">*</span></label><input type="text" id="f_type" placeholder="Boeing 737, Airbus A320..."></div>
+      <div class="field"><label>Typ lietadla <span class="req">*</span></label><input type="text" id="f_type" placeholder="Boeing 737, Airbus A320..."><span class="hint" id="typeHint"></span></div>
       <div class="field"><label>Dátum <span class="req">*</span></label><input type="date" id="f_date"></div>
       <div class="field field--wide">
         <label>Fotografie <span class="req">*</span> <span class="hint">(aspoň jedna; viac uhlov toho istého preletu)</span></label>
@@ -604,6 +604,26 @@ $('btnRemoveFrShot').addEventListener('click', () => {
 });
 
 /* ---------- submission form open/close ---------- */
+let typeAutofilled = false;
+let regLookupTimer = null;
+async function lookupReg(){
+  const reg = ($('f_reg').value || '').replace(/\s+/g, '').toUpperCase();
+  if(reg.length < 3) return;
+  const { data } = await sb.from('aircraft').select('type, operator').eq('reg', reg).maybeSingle();
+  if(!data) { if(typeAutofilled){ $('f_type').value = ''; typeAutofilled = false; } $('typeHint').textContent = ''; return; }
+  if(data.type && (!$('f_type').value.trim() || typeAutofilled)){
+    $('f_type').value = data.type;
+    typeAutofilled = true;
+    $('typeHint').textContent = 'Typ doplnený z databázy, môžeš ho zmeniť.';
+  }
+  if(data.operator && !$('f_operator').value.trim()){
+    $('f_operator').value = data.operator;
+    showOpt('operator', true);
+  }
+}
+$('f_reg').addEventListener('input', () => { clearTimeout(regLookupTimer); regLookupTimer = setTimeout(lookupReg, 450); });
+$('f_type').addEventListener('input', () => { typeAutofilled = false; $('typeHint').textContent = ''; });
+
 const OPT_LABELS = { time:'Čas', location:'Lokalita', category:'Kategória', operator:'Dopravca', flightno:'Číslo letu', route:'Trasa', notes:'Poznámky', fr:'FlightRadar screenshot' };
 const OPT_INPUT = { time:'f_time', location:'f_location', category:'f_category', operator:'f_operator', flightno:'f_flightno', route:'f_route', notes:'f_notes' };
 function renderChips(){
@@ -636,6 +656,9 @@ document.querySelector('.opt-section').addEventListener('click', (e) => {
 function resetForm(){
   ['f_date','f_time','f_location','f_reg','f_type','f_operator','f_flightno','f_route','f_notes'].forEach(id => $(id).value = '');
   $('f_category').value = 'commercial';
+  $('f_date').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  $('typeHint').textContent = '';
+  typeAutofilled = false;
   currentPhotos.forEach(p => { if(p.previewUrl) URL.revokeObjectURL(p.previewUrl); });
   currentPhotos = [{ blob: null, previewUrl: null, filename: '' }];
   existingPhotos = [];
