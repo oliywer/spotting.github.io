@@ -34,7 +34,7 @@
 *{box-sizing:border-box;}
 body{
   margin:0;
-  background: var(--bg);
+  background: linear-gradient(180deg, #DCE9FF 0, var(--bg) 380px) no-repeat, var(--bg);
   color: var(--ink-soft);
   font-family: var(--font-body);
   min-height:100vh;
@@ -57,8 +57,8 @@ body{
 .btn{ font-family: var(--font-body); font-size:14px; font-weight:600; border:none; border-radius:10px; padding:11px 18px; cursor:pointer; transition: background .15s ease, border-color .15s ease, color .15s ease; }
 .btn:active{ transform: translateY(1px); }
 .btn:disabled{ opacity:0.5; cursor:default; }
-.btn--amber{ background: var(--primary); color:#fff; }
-.btn--amber:hover{ background: var(--primary-dark); }
+.btn--amber{ background: linear-gradient(135deg, #2563EB, #0EA5E9); color:#fff; box-shadow: 0 4px 12px rgba(37,99,235,.25); }
+.btn--amber:hover{ background: linear-gradient(135deg, #1D4ED8, #0284C7); }
 .btn--ghost{ background: var(--surface); color: var(--ink-soft); border:1px solid var(--border); }
 .btn--ghost:hover{ color: var(--ink); border-color: var(--muted); }
 .btn--danger{ background: transparent; color: var(--danger); border:1px solid var(--danger-soft); }
@@ -205,32 +205,56 @@ body{
 .tab{ font-family: var(--font-body); font-size:14px; font-weight:600; color: var(--ink-soft); background:none; border:none; padding:10px 16px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
 .tab:hover{ color: var(--ink); }
 .tab.active{ color: var(--primary); border-bottom-color: var(--primary); }
+.tabs .tab{ font-size:15px; }
 .view.hidden{ display:none; }
 .auth-tabs{ display:flex; gap:14px; margin-bottom:14px; }
 .auth-tabs span{ cursor:pointer; font-weight:600; font-size:14px; color: var(--muted); padding-bottom:4px; border-bottom:2px solid transparent; }
 .auth-tabs span.active{ color: var(--primary); border-bottom-color: var(--primary); }
-.profile-card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding:18px 20px; margin-bottom:20px; box-shadow: var(--shadow); display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
-.profile-card__lvl{ width:58px; height:58px; border-radius:50%; background: var(--primary); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family: var(--font-display); line-height:1; flex-shrink:0; }
-.profile-card__lvl small{ font-size:9px; font-weight:600; letter-spacing:.5px; opacity:.85; }
-.profile-card__lvl b{ font-size:22px; }
-.profile-card__main{ flex:1; min-width:200px; }
-.profile-card__name{ font-family: var(--font-display); font-weight:700; font-size:18px; color: var(--ink); }
-.profile-card__sub{ font-size:12.5px; color: var(--muted); margin-top:2px; }
-.xpbar{ height:8px; background: var(--surface-alt); border-radius:8px; overflow:hidden; margin-top:10px; }
-.xpbar > div{ height:100%; background: linear-gradient(90deg, var(--primary), #38BDF8); border-radius:8px; transition: width .4s ease; }
-.card-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap:16px; }
-.gcard{ position:relative; background: var(--surface); border-radius: var(--radius); overflow:hidden; border:2px solid var(--rc, var(--border)); box-shadow: var(--shadow); display:flex; flex-direction:column; cursor:pointer; transition: transform .15s ease; }
-.gcard:hover{ transform: translateY(-3px); }
-.gcard__img{ aspect-ratio:4/3; background: var(--surface-alt); overflow:hidden; }
+.hero{ background: linear-gradient(135deg, #1E3A8A, #2563EB 55%, #0EA5E9); color:#fff; border-radius: 18px; padding:20px 22px; margin-bottom:18px; box-shadow: 0 10px 28px rgba(37,99,235,.28); display:flex; gap:20px; align-items:center; flex-wrap:wrap; position:relative; overflow:hidden; }
+.hero::after{ content:''; position:absolute; right:-40px; top:-40px; width:200px; height:200px; border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,.22), transparent 70%); pointer-events:none; }
+.ring{ --p:0; width:84px; height:84px; border-radius:50%; background: conic-gradient(#FDE68A calc(var(--p) * 1%), rgba(255,255,255,.22) 0); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ring__in{ width:68px; height:68px; border-radius:50%; background:#1E3A8A; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family: var(--font-display); line-height:1; }
+.ring__in small{ font-size:9px; letter-spacing:1px; opacity:.8; }
+.ring__in b{ font-size:28px; }
+.hero__main{ flex:1; min-width:200px; position:relative; z-index:1; }
+.hero__name{ font-family: var(--font-display); font-weight:700; font-size:22px; }
+.hero__sub{ font-size:12.5px; opacity:.85; margin-top:3px; }
+.hero__stats{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.hero__stat{ background: rgba(255,255,255,.14); border-radius:12px; padding:8px 14px; font-size:11px; opacity:.95; }
+.hero__stat b{ display:block; font-family: var(--font-display); font-size:19px; }
+.rfilters{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center; }
+.rf{ font-family: var(--font-body); font-size:12.5px; font-weight:600; border:1.5px solid var(--border); background: var(--surface); color: var(--ink-soft); border-radius:20px; padding:6px 13px; cursor:pointer; }
+.rf i{ font-style:normal; opacity:.7; margin-left:4px; }
+.rf.active{ background: var(--rc, var(--primary)); border-color: var(--rc, var(--primary)); color:#fff; }
+.rf:hover{ border-color: var(--rc, var(--primary)); }
+.rsort{ margin-left:auto; background: var(--surface); border:1px solid var(--border); border-radius:9px; padding:8px 12px; font-family: var(--font-body); font-size:13px; color: var(--ink); }
+.card-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:18px; }
+.gcard{ position:relative; background: var(--surface); border-radius:16px; overflow:hidden; border:2px solid var(--rc, var(--border)); box-shadow: 0 2px 6px rgba(16,24,40,.06), 0 8px 20px -6px var(--rc-glow, rgba(16,24,40,.12)); display:flex; flex-direction:column; cursor:pointer; transition: transform .2s ease, box-shadow .2s ease; }
+.gcard:hover{ transform: translateY(-5px) rotate(-.6deg) scale(1.02); box-shadow: 0 14px 30px -8px var(--rc, #000); }
+.gcard__top{ display:flex; justify-content:space-between; align-items:center; padding:7px 10px; background: var(--rc); color:#fff; font-size:10px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; }
+.gcard__top span:last-child{ font-family: var(--font-mono); opacity:.9; }
+.gcard__img{ aspect-ratio:4/3; background: var(--surface-alt); overflow:hidden; position:relative; }
 .gcard__img img{ width:100%; height:100%; object-fit:cover; display:block; }
-.gcard__rar{ position:absolute; top:8px; left:8px; background: var(--rc); color:#fff; font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; padding:3px 8px; border-radius:20px; }
-.gcard__x{ position:absolute; top:8px; right:8px; background: rgba(16,24,40,.72); color:#fff; font-size:11px; font-weight:600; padding:3px 8px; border-radius:20px; }
-.gcard__body{ padding:10px 12px 12px; }
-.gcard__reg{ font-family: var(--font-mono); font-weight:600; font-size:14px; color: var(--ink); }
-.gcard__type{ font-size:12.5px; color: var(--ink-soft); margin-top:2px; }
+.gcard__x{ position:absolute; bottom:6px; right:6px; background: rgba(16,24,40,.75); color:#fff; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.gcard__body{ padding:10px 12px 12px; background: linear-gradient(180deg, #fff, var(--rc-soft, #fff)); }
+.gcard__reg{ font-family: var(--font-mono); font-weight:600; font-size:16px; color: var(--ink); }
+.gcard__type{ font-size:12.5px; color: var(--ink-soft); margin-top:2px; font-weight:500; }
 .gcard__op{ font-size:11.5px; color: var(--muted); }
-.gcard__first{ font-size:11px; color: var(--accent); font-weight:700; margin-top:4px; }
-.r-common{ --rc:#94A3B8; } .r-uncommon{ --rc:#16A34A; } .r-rare{ --rc:#2563EB; } .r-epic{ --rc:#9333EA; } .r-legendary{ --rc:#F59E0B; }
+.gcard__stars{ color: var(--rc); letter-spacing:2px; font-size:12px; margin-top:6px; }
+.gcard__first{ font-size:11px; color:#B45309; background:#FEF3C7; display:inline-block; font-weight:700; margin-top:6px; padding:2px 8px; border-radius:20px; }
+.gcard.shine::before{ content:''; position:absolute; inset:0; z-index:2; pointer-events:none; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.55) 48%, transparent 60%); transform: translateX(-120%); }
+.gcard.shine:hover::before{ transform: translateX(120%); transition: transform .8s ease; }
+.gcard.r-legendary.shine::before{ animation: sheen 3.4s ease-in-out infinite; }
+@keyframes sheen{ 0%,55%{ transform: translateX(-120%); } 100%{ transform: translateX(120%); } }
+.r-common{ --rc:#94A3B8; --rc-soft:#F8FAFC; --rc-glow:rgba(148,163,184,.25); }
+.r-uncommon{ --rc:#16A34A; --rc-soft:#F0FDF4; --rc-glow:rgba(22,163,74,.3); }
+.r-rare{ --rc:#2563EB; --rc-soft:#EFF6FF; --rc-glow:rgba(37,99,235,.35); }
+.r-epic{ --rc:#9333EA; --rc-soft:#FAF5FF; --rc-glow:rgba(147,51,234,.4); }
+.r-legendary{ --rc:#F59E0B; --rc-soft:#FFFBEB; --rc-glow:rgba(245,158,11,.5); }
+.tile__rar{ position:absolute; bottom:8px; left:8px; z-index:2; background: var(--rc); color:#fff; font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:3px 8px; border-radius:20px; }
+.reward{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; background: linear-gradient(135deg, #EFF6FF, #FAF5FF); border-radius:14px; padding:14px 16px; margin:4px 0 6px; }
+.reward__xp{ font-family: var(--font-display); font-weight:700; font-size:30px; color: var(--primary); }
+.reward__txt{ font-size:13.5px; color: var(--ink); line-height:1.5; }
 .lb{ width:100%; border-collapse:collapse; font-size:14px; background: var(--surface); border-radius: var(--radius); overflow:hidden; box-shadow: var(--shadow); }
 .lb th{ text-align:left; font-size:12px; color: var(--muted); font-weight:600; padding:12px 14px; border-bottom:1px solid var(--border); }
 .lb td{ padding:12px 14px; border-bottom:1px solid var(--border); color: var(--ink); }
@@ -299,8 +323,8 @@ body{
   </div>
 
   <div id="thanksPanel" class="panel hidden">
-    <h2>ĎAKUJEME</h2>
-    <p>Pozorovanie je zverejnené v galérii. XP a kartu lietadla nájdeš v záložke Moja zbierka.</p>
+    <h2>HOTOVO</h2>
+    <div id="rewardBox"></div>
     <div class="form-actions"><button id="btnThanksOk" class="btn btn--amber">OK</button></div>
   </div>
 
@@ -437,6 +461,16 @@ let currentUser = null;
 let isAdmin = false;
 let myProfile = null;
 let authMode = 'login';
+const RARITY_ORDER = { common:1, uncommon:2, rare:3, epic:4, legendary:5 };
+// Musí zodpovedať SQL funkcii rarity_for_type
+function rarityForType(t){
+  t = (t || '').toLowerCase();
+  if(/(an-?225|an-?124|beluga|dreamlifter|concorde)/.test(t)) return 'legendary';
+  if(/(a380|747|a340|md-?11)/.test(t)) return 'epic';
+  if(/(a350|787|777)/.test(t)) return 'rare';
+  if(/(a330|a300|a310|767|757|a220|717|md-?8|md-?9|crj|q400|dash ?8)/.test(t)) return 'uncommon';
+  return 'common';
+}
 const RARITY = { common:'Bežné', uncommon:'Menej bežné', rare:'Vzácne', epic:'Epické', legendary:'Legendárne' };
 const RARITY_XP = { common:20, uncommon:35, rare:60, epic:100, legendary:250 };
 let currentPhotos = [];
@@ -756,9 +790,20 @@ async function submitNew(reg, type){
 
   $('formPanel').classList.add('hidden');
   resetForm();
-  $('thanksPanel').classList.remove('hidden');
+  const beforeXp = myProfile ? myProfile.xp : 0;
+  const { data: got } = await sb.from('sightings').select('xp_awarded').eq('id', sightingId).maybeSingle();
+  const gained = got ? got.xp_awarded : 0;
   await loadMyProfile();
   updateAuthUI();
+  const rar = rarityForType(type);
+  const regN = (reg || '').replace(/\s+/g, '').toUpperCase();
+  let line = 'Pozorovanie je zverejnené v galérii.';
+  if(gained >= 20) line = `Nová karta <b>${escapeHtml(regN)}</b> · ${RARITY[rar]} ${'★'.repeat(RARITY_ORDER[rar])}` + (gained > RARITY_XP[rar] ? '<br>★ Si prvý, kto toto lietadlo objavil!' : '');
+  else if(gained === 3) line = `Toto lietadlo už máš v zbierke, pozorovanie sa pripísalo.`;
+  const lvl = myProfile ? levelInfo(myProfile.xp).level : 1;
+  const up = myProfile && lvl > levelInfo(beforeXp).level ? `<br>🎉 Nový level: <b>${lvl}</b>` : '';
+  $('rewardBox').innerHTML = `<div class="reward"><div class="reward__xp">+${gained} XP</div><div class="reward__txt">${line}${up}</div></div>`;
+  $('thanksPanel').classList.remove('hidden');
   loadGallery();
   if(currentView === 'collection') loadCollection();
 }
@@ -959,6 +1004,9 @@ document.querySelector('.tabs').addEventListener('click', (e) => {
 });
 
 /* ---------- collection ---------- */
+let collData = [];
+let collSort = 'rarity_desc';
+let collFilter = 'all';
 async function loadCollection(){
   const box = $('view-collection');
   if(!currentUser){
@@ -969,40 +1017,91 @@ async function loadCollection(){
   box.innerHTML = '<div class="loading">Načítavam zbierku...</div>';
   await loadMyProfile();
   updateAuthUI();
-  const { data, error } = await sb.from('collection').select('*, aircraft(*)').eq('user_id', currentUser.id).order('first_at', { ascending: false });
+  const { data, error } = await sb.from('collection').select('*, aircraft(*)').eq('user_id', currentUser.id).order('first_at', { ascending: true });
   if(error){ box.innerHTML = ''; toast('Chyba pri načítaní zbierky: ' + error.message); return; }
+  collData = (data || []).map((c, i) => ({ ...c, no: i + 1 }));
+  renderCollection();
+}
+
+function sortColl(list){
+  const r = (c) => RARITY_ORDER[(c.aircraft || {}).rarity] || 1;
+  const cmp = {
+    rarity_desc: (a, b) => r(b) - r(a) || a.reg.localeCompare(b.reg),
+    rarity_asc:  (a, b) => r(a) - r(b) || a.reg.localeCompare(b.reg),
+    newest:      (a, b) => b.no - a.no,
+    oldest:      (a, b) => a.no - b.no,
+    spotted:     (a, b) => b.times_spotted - a.times_spotted || r(b) - r(a),
+    reg:         (a, b) => a.reg.localeCompare(b.reg),
+    type:        (a, b) => ((a.aircraft || {}).type || '').localeCompare((b.aircraft || {}).type || '') || a.reg.localeCompare(b.reg)
+  }[collSort];
+  return list.slice().sort(cmp);
+}
+
+function renderCollection(){
+  const box = $('view-collection');
   const xp = myProfile ? myProfile.xp : 0;
   const li = levelInfo(xp);
-  let html = `<div class="profile-card">
-    <div class="profile-card__lvl"><small>LEVEL</small><b>${li.level}</b></div>
-    <div class="profile-card__main">
-      <div class="profile-card__name">${escapeHtml(myProfile ? myProfile.display_name : '')}</div>
-      <div class="profile-card__sub">${xp} XP · ${data.length} ${data.length === 1 ? 'karta' : (data.length >= 2 && data.length <= 4 ? 'karty' : 'kariet')} · ďalší level pri ${li.next} XP</div>
-      <div class="xpbar"><div style="width:${li.pct}%"></div></div>
+  const counts = { common:0, uncommon:0, rare:0, epic:0, legendary:0 };
+  collData.forEach(c => { counts[(c.aircraft || {}).rarity || 'common']++; });
+  const best = ['legendary','epic','rare','uncommon','common'].find(k => counts[k] > 0);
+  const n = collData.length;
+  let html = `<div class="hero">
+    <div class="ring" style="--p:${li.pct}"><div class="ring__in"><small>LEVEL</small><b>${li.level}</b></div></div>
+    <div class="hero__main">
+      <div class="hero__name">${escapeHtml(myProfile ? myProfile.display_name : '')}</div>
+      <div class="hero__sub">${xp} / ${li.next} XP do levelu ${li.level + 1}</div>
+      <div class="hero__stats">
+        <div class="hero__stat"><b>${n}</b>kariet</div>
+        <div class="hero__stat"><b>${xp}</b>XP</div>
+        <div class="hero__stat"><b>${best ? RARITY[best] : '—'}</b>najvzácnejšia</div>
+      </div>
     </div>
   </div>`;
-  if(!data.length){
-    html += `<div class="empty">Zatiaľ nemáš žiadnu kartu. Pridaj pozorovanie s registráciou lietadla — po schválení dostaneš prvú kartu a XP.<br><br><small>XP: nová karta 20–250 podľa vzácnosti typu, +30 ak registráciu objavíš ako prvý, opakované pozorovanie 3 XP.</small></div>`;
-  }else{
-    html += '<div class="card-grid">' + data.map(c => {
-      const ac = c.aircraft || {};
-      const en = state.entries.find(e => e.id === c.first_sighting_id) || state.entries.find(e => e.userId === currentUser.id && (e.reg || '').replace(/\s+/g,'').toUpperCase() === c.reg);
-      const img = en && en.photos[0] ? `<img src="${en.photos[0].url}" alt="">` : '';
-      const first = ac.first_spotter === currentUser.id ? '<div class="gcard__first">★ Prvý objaviteľ</div>' : '';
-      return `<div class="gcard r-${ac.rarity || 'common'}" ${en ? `data-card-entry="${en.id}"` : ''}>
-        <div class="gcard__img">${img}</div>
-        <div class="gcard__rar">${RARITY[ac.rarity] || 'Bežné'}</div>
-        ${c.times_spotted > 1 ? `<div class="gcard__x">×${c.times_spotted}</div>` : ''}
-        <div class="gcard__body">
-          <div class="gcard__reg">${escapeHtml(c.reg)}</div>
-          <div class="gcard__type">${escapeHtml(ac.type || '')}</div>
-          <div class="gcard__op">${escapeHtml(ac.operator || '')}</div>
-          ${first}
-        </div></div>`;
-    }).join('') + '</div>';
+  if(!n){
+    html += `<div class="empty">Zatiaľ nemáš žiadnu kartu. Pridaj pozorovanie s registráciou lietadla a prvá karta bude tvoja.<br><br><small>XP: nová karta 20–250 podľa vzácnosti typu, +30 ak registráciu objavíš ako prvý, opakované pozorovanie 3 XP.</small></div>`;
+    box.innerHTML = html;
+    return;
   }
+  const rfs = [['all', 'Všetky', n]].concat(['legendary','epic','rare','uncommon','common'].filter(k => counts[k]).map(k => [k, RARITY[k], counts[k]]));
+  html += '<div class="rfilters">' + rfs.map(([k, label, cnt]) =>
+    `<button class="rf ${k !== 'all' ? 'r-' + k : ''} ${collFilter === k ? 'active' : ''}" data-rf="${k}">${label}<i>${cnt}</i></button>`).join('') +
+    `<select id="collSort" class="rsort">
+      <option value="rarity_desc">Od najvzácnejších</option>
+      <option value="rarity_asc">Od najbežnejších</option>
+      <option value="newest">Najnovšie</option>
+      <option value="oldest">Najstaršie</option>
+      <option value="spotted">Najviac pozorovaní</option>
+      <option value="reg">Registrácia A–Z</option>
+      <option value="type">Typ A–Z</option>
+    </select></div>`;
+  const shown = sortColl(collData.filter(c => collFilter === 'all' || ((c.aircraft || {}).rarity || 'common') === collFilter));
+  html += '<div class="card-grid">' + shown.map(c => {
+    const ac = c.aircraft || {};
+    const rar = ac.rarity || 'common';
+    const en = state.entries.find(e => e.id === c.first_sighting_id) || state.entries.find(e => e.userId === currentUser.id && (e.reg || '').replace(/\s+/g,'').toUpperCase() === c.reg);
+    const img = en && en.photos[0] ? `<img src="${en.photos[0].url}" alt="">` : '';
+    const first = ac.first_spotter === currentUser.id ? '<div class="gcard__first">★ Prvý objaviteľ</div>' : '';
+    return `<div class="gcard r-${rar} ${RARITY_ORDER[rar] >= 3 ? 'shine' : ''}" ${en ? `data-card-entry="${en.id}"` : ''}>
+      <div class="gcard__top"><span>${RARITY[rar]}</span><span>№ ${String(c.no).padStart(3, '0')}</span></div>
+      <div class="gcard__img">${img}${c.times_spotted > 1 ? `<div class="gcard__x">×${c.times_spotted}</div>` : ''}</div>
+      <div class="gcard__body">
+        <div class="gcard__reg">${escapeHtml(c.reg)}</div>
+        <div class="gcard__type">${escapeHtml(ac.type || '')}</div>
+        <div class="gcard__op">${escapeHtml(ac.operator || '')}</div>
+        <div class="gcard__stars">${'★'.repeat(RARITY_ORDER[rar])}</div>
+        ${first}
+      </div></div>`;
+  }).join('') + '</div>';
   box.innerHTML = html;
+  $('collSort').value = collSort;
 }
+$('view-collection').addEventListener('change', (e) => {
+  if(e.target.id === 'collSort'){ collSort = e.target.value; renderCollection(); }
+});
+$('view-collection').addEventListener('click', (e) => {
+  const f = e.target.closest('[data-rf]');
+  if(f){ collFilter = f.getAttribute('data-rf'); renderCollection(); }
+});
 $('view-collection').addEventListener('click', (e) => {
   const c = e.target.closest('[data-card-entry]');
   if(!c) return;
@@ -1140,6 +1239,8 @@ function renderStats(){
 function tileHtml(en){
   const first = en.photos[0];
   const photoInner = first ? `<img class="tile__photo" src="${first.url}" alt="${escapeHtml(en.type || 'lietadlo')}">` : `<div class="tile__nophoto">bez fotky</div>`;
+  const rar = rarityForType(en.type);
+  const rarBadge = rar !== 'common' ? `<div class="tile__rar r-${rar}">${RARITY[rar]}</div>` : '';
   const countBadge = en.photos.length > 1 ? `<div class="tile__count">+${en.photos.length - 1}</div>` : '';
   const adminDel = isAdmin ? `<button class="tile__admin-del" data-admin-del="${en.id}" title="Zmazať">✕</button>` : '';
   const adminEdit = isAdmin ? `<button class="tile__admin-edit" data-admin-edit="${en.id}" title="Upraviť">✎</button>` : '';
@@ -1148,6 +1249,7 @@ function tileHtml(en){
     <div class="tile__photo-wrap" ${en.photos.length ? `data-photo="${en.id}"` : ''}>
       <div class="tile__tab tile__tab--${en.category || 'other'}"></div>
       ${photoInner}
+      ${rarBadge}
       ${countBadge}
       ${adminDel}
       ${adminEdit}
