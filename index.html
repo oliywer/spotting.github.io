@@ -188,6 +188,32 @@ body{
 .lightbox__close{ position:absolute; top:12px; right:12px; z-index:3; width:32px; height:32px; border-radius:50%; background: rgba(255,255,255,0.92); color: var(--ink); border:none; font-size:15px; cursor:pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .lightbox__close:hover{ background: #fff; }
 
+.mosaic-wrap{ position:relative; margin-bottom:22px; }
+.mosaic-wrap.hidden{ display:none; }
+.mosaic{ display:grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 150px; grid-auto-flow: dense; gap:10px; }
+.m-tile{ position:relative; overflow:hidden; border-radius:18px; background:#CBD9EE; cursor:pointer; box-shadow: 0 2px 6px rgba(16,24,40,.08), 0 10px 24px -8px rgba(16,24,40,.25); isolation:isolate; transform: translateZ(0); }
+.m-big{ grid-column: span 2; grid-row: span 2; }
+.m-tall{ grid-row: span 2; }
+.m-wide{ grid-column: span 2; }
+.m-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition: opacity .9s ease, transform 6s ease; z-index:0; }
+.m-img.on{ opacity:1; }
+.m-tile:hover .m-img.on{ transform: scale(1.06); }
+.m-cap{ position:absolute; left:0; right:0; bottom:0; z-index:2; padding:26px 12px 10px; color:#fff; background: linear-gradient(0deg, rgba(10,18,38,.78), rgba(10,18,38,0)); font-size:12px; line-height:1.35; pointer-events:none; transition: opacity .4s; }
+.m-cap b{ display:block; font-family: var(--font-mono); font-size:13px; letter-spacing:.3px; }
+.m-big .m-cap b{ font-size:18px; }
+.m-big .m-cap{ font-size:13.5px; padding:40px 18px 16px; }
+.m-rar{ position:absolute; top:10px; left:10px; z-index:3; color:#fff; background: var(--rc); font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; padding:3px 9px; border-radius:20px; }
+.mosaic-shuffle{ position:absolute; right:12px; top:12px; z-index:5; background: rgba(255,255,255,.92); color: var(--ink); border:none; border-radius:20px; padding:7px 14px; font-family: var(--font-body); font-weight:600; font-size:12.5px; cursor:pointer; box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+.mosaic-shuffle:hover{ background:#fff; }
+.mosaic.swap{ animation: mfade .5s ease; }
+@keyframes mfade{ from{ opacity:0; transform: scale(.985); } to{ opacity:1; transform:none; } }
+@media (max-width:640px){
+  .mosaic{ grid-template-columns: repeat(2, 1fr); grid-auto-rows: 118px; gap:8px; }
+  .m-tile{ border-radius:14px; }
+  .m-big .m-cap b{ font-size:15px; }
+  .mosaic-shuffle{ top:8px; right:8px; padding:6px 11px; }
+}
+@media (prefers-reduced-motion: reduce){ .m-img{ transition:none; } .mosaic.swap{ animation:none; } }
 .req{ color: var(--danger); font-weight:700; }
 .hint{ color: var(--muted); font-weight:400; font-size:11.5px; }
 .form-note{ margin:-8px 0 14px !important; font-size:12.5px !important; color: var(--muted) !important; }
@@ -299,9 +325,10 @@ body{
   <div id="loginPanel" class="panel hidden">
     <div class="auth-tabs"><span id="tabLogin" class="active">Prihlásenie</span><span id="tabRegister">Registrácia</span></div>
     <div class="form-grid">
-      <div class="field hidden" id="nameField"><label>Prezývka (2–24 znakov, vidia ju všetci)</label><input type="text" id="l_name" maxlength="24"></div>
-      <div class="field"><label>Email</label><input type="email" id="l_email" autocomplete="email"></div>
-      <div class="field"><label>Heslo (min. 6 znakov)</label><input type="password" id="l_password" autocomplete="current-password"></div>
+      <div class="field hidden" id="nameField"><label>Prezývka (2–24 znakov, bez @, vidia ju všetci)</label><input type="text" id="l_name" maxlength="24" autocomplete="nickname"></div>
+      <div class="field"><label id="l_idLabel">Email alebo prezývka</label><input type="text" id="l_email" autocomplete="username" autocapitalize="none"></div>
+      <div class="field"><label>Heslo</label><input type="password" id="l_password" autocomplete="current-password"></div>
+      <div class="field hidden" id="pass2Field"><label>Heslo znova</label><input type="password" id="l_password2" autocomplete="new-password"></div>
     </div>
     <p id="authHint" style="font-size:12.5px;color:var(--muted);margin:12px 0 0;"></p>
     <div class="form-actions">
@@ -399,6 +426,10 @@ body{
   <div id="view-leaderboard" class="view hidden"></div>
 
   <div id="view-gallery" class="view">
+  <section id="mosaicWrap" class="mosaic-wrap hidden">
+    <div id="mosaic" class="mosaic"></div>
+    <button id="mosaicShuffle" class="mosaic-shuffle" type="button" title="Zamiešať">↻ Zamiešať</button>
+  </section>
   <div class="controls">
     <input id="search" placeholder="Hľadať (typ, registrácia, dopravca, trasa...)">
     <select id="filterLoc"><option value="">Všetky lokality</option></select>
@@ -889,41 +920,54 @@ function openAuth(mode){
 }
 function setAuthMode(mode){
   authMode = mode;
-  $('tabLogin').classList.toggle('active', mode === 'login');
-  $('tabRegister').classList.toggle('active', mode === 'register');
-  $('nameField').classList.toggle('hidden', mode !== 'register');
-  $('btnLoginSubmit').textContent = mode === 'register' ? 'Vytvoriť účet' : 'Prihlásiť';
-  $('l_password').autocomplete = mode === 'register' ? 'new-password' : 'current-password';
-  $('authHint').textContent = mode === 'register' ? 'Po registrácii ti môže prísť potvrdzovací email — klikni na odkaz v ňom a potom sa prihlás.' : '';
+  const reg = mode === 'register';
+  $('tabLogin').classList.toggle('active', !reg);
+  $('tabRegister').classList.toggle('active', reg);
+  $('nameField').classList.toggle('hidden', !reg);
+  $('pass2Field').classList.toggle('hidden', !reg);
+  $('l_idLabel').textContent = reg ? 'Email' : 'Email alebo prezývka';
+  $('l_email').type = reg ? 'email' : 'text';
+  $('btnLoginSubmit').textContent = reg ? 'Vytvoriť účet' : 'Prihlásiť';
+  $('l_password').autocomplete = reg ? 'new-password' : 'current-password';
+  $('authHint').textContent = reg ? 'Po registrácii ti môže prísť potvrdzovací email — klikni na odkaz v ňom a potom sa prihlás.' : '';
 }
 $('tabLogin').addEventListener('click', () => setAuthMode('login'));
 $('tabRegister').addEventListener('click', () => setAuthMode('register'));
 $('btnLoginCancel').addEventListener('click', () => $('loginPanel').classList.add('hidden'));
 $('btnLoginSubmit').addEventListener('click', async () => {
-  const email = $('l_email').value.trim();
+  const id = $('l_email').value.trim();
   const password = $('l_password').value;
-  if(!email || !password){ toast('Zadaj email a heslo.'); return; }
+  if(!id || !password){ toast(authMode === 'register' ? 'Vyplň všetky polia.' : 'Zadaj email alebo prezývku a heslo.'); return; }
   $('btnLoginSubmit').disabled = true;
   try{
     if(authMode === 'register'){
       const name = $('l_name').value.trim();
       if(name.length < 2){ toast('Prezývka musí mať aspoň 2 znaky.'); return; }
+      if(name.includes('@')){ toast('Prezývka nesmie obsahovať @.'); return; }
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(id)){ toast('Zadaj platný email.'); return; }
       if(password.length < 6){ toast('Heslo musí mať aspoň 6 znakov.'); return; }
-      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name: name } } });
+      if(password !== $('l_password2').value){ toast('Heslá sa nezhodujú.'); return; }
+      const { data, error } = await sb.auth.signUp({ email: id, password, options: { data: { display_name: name } } });
       if(error){ toast('Registrácia zlyhala: ' + error.message, 5000); return; }
       $('loginPanel').classList.add('hidden');
-      $('l_password').value = '';
+      $('l_password').value = ''; $('l_password2').value = '';
       toast(data.session ? 'Účet vytvorený, vitaj!' : 'Účet vytvorený. Pozri si email a potvrď ho, potom sa prihlás.', 6000);
     }else{
+      let email = id;
+      if(!id.includes('@')){
+        const { data, error } = await sb.rpc('login_email', { p_ident: id, p_password: password });
+        if(error || !data){ toast('Nesprávna prezývka alebo heslo.', 4000); return; }
+        email = data;
+      }
       const { error } = await sb.auth.signInWithPassword({ email, password });
-      if(error){ toast('Prihlásenie zlyhalo: ' + error.message, 5000); return; }
+      if(error){ toast(/invalid/i.test(error.message) ? 'Nesprávny email alebo heslo.' : 'Prihlásenie zlyhalo: ' + error.message, 4500); return; }
       $('loginPanel').classList.add('hidden');
       $('l_password').value = '';
       toast('Prihlásený.', 1500);
     }
   }finally{ $('btnLoginSubmit').disabled = false; }
 });
-['l_email','l_password','l_name'].forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') $('btnLoginSubmit').click(); }));
+['l_email','l_password','l_name','l_password2'].forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') $('btnLoginSubmit').click(); }));
 
 $('btnPwCancel').addEventListener('click', () => { $('pwPanel').classList.add('hidden'); $('pw_new').value = ''; $('pw_new2').value = ''; });
 $('btnPwSave').addEventListener('click', async () => {
@@ -1223,6 +1267,8 @@ async function loadGallery(){
   state.entries = (data || []).map(mapRow);
   renderStats();
   render();
+  renderMosaic(false);
+  startMosaicTimer();
 }
 
 function renderStats(){
@@ -1355,6 +1401,93 @@ $('galleryList').addEventListener('click', async (e) => {
 });
 
 ['search','filterLoc','filterCat','filterType','sortMode'].forEach(id => $(id).addEventListener(id === 'search' ? 'input' : 'change', render));
+
+/* ---------- mozaika ---------- */
+const MOSAIC_PATTERNS = [
+  ['big','tall','s','s','wide','s','s'],
+  ['tall','s','big','s','wide','s','s'],
+  ['wide','s','s','big','tall','s','s'],
+  ['s','big','s','tall','s','wide','s']
+];
+let mosaicSlots = [];   // entry pre každý slot
+let mosaicPattern = 0;
+let mosaicTick = 0;
+let mosaicTimer = null;
+
+function mosaicScore(en){
+  return (RARITY_ORDER[rarityForType(en.type)] || 1) * 2 + Math.min(en.photos.length, 4) + Math.random() * 4;
+}
+function pickMosaicEntries(n){
+  const pool = state.entries.filter(e => e.photos.length).map(e => ({ e, sc: mosaicScore(e) })).sort((a, b) => b.sc - a.sc);
+  const out = [], types = new Set();
+  for(const { e } of pool){ if(out.length >= n) break; const t = e.type || e.id; if(!types.has(t)){ types.add(t); out.push(e); } }
+  for(const { e } of pool){ if(out.length >= n) break; if(!out.includes(e)) out.push(e); }
+  return out;
+}
+function mosaicCaption(en){
+  return `<b>${escapeHtml(en.reg || '—')}</b>${escapeHtml(en.type || '')}${en.operator ? ' · ' + escapeHtml(en.operator) : ''}`;
+}
+function mosaicRarBadge(en){
+  const r = rarityForType(en.type);
+  return r !== 'common' ? `<div class="m-rar r-${r}">${RARITY[r]}</div>` : '';
+}
+function renderMosaic(newPattern){
+  const wrap = $('mosaicWrap');
+  const withPhotos = state.entries.filter(e => e.photos.length);
+  if(withPhotos.length < 7){ wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  if(newPattern !== false) mosaicPattern = (mosaicPattern + 1 + Math.floor(Math.random() * (MOSAIC_PATTERNS.length - 1))) % MOSAIC_PATTERNS.length;
+  const pat = MOSAIC_PATTERNS[mosaicPattern];
+  mosaicSlots = pickMosaicEntries(pat.length);
+  const box = $('mosaic');
+  box.innerHTML = pat.map((k, i) => {
+    const en = mosaicSlots[i];
+    return `<div class="m-tile m-${k}" data-slot="${i}" data-id="${en.id}">
+      <img class="m-img on" src="${en.photos[0].url}" alt="${escapeHtml(en.type || 'lietadlo')}" ${i > 3 ? 'loading="lazy"' : ''}>
+      ${mosaicRarBadge(en)}<div class="m-cap">${mosaicCaption(en)}</div></div>`;
+  }).join('');
+  box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap');
+}
+function swapMosaicTile(slot){
+  const shown = new Set(mosaicSlots.map(e => e.id));
+  const cands = state.entries.filter(e => e.photos.length && !shown.has(e.id));
+  if(!cands.length) return;
+  const en = cands[Math.floor(Math.random() * cands.length)];
+  const tile = document.querySelector(`#mosaic [data-slot="${slot}"]`);
+  if(!tile) return;
+  const pre = new Image();
+  pre.onload = () => {
+    const old = tile.querySelector('.m-img.on');
+    const img = document.createElement('img');
+    img.className = 'm-img'; img.src = pre.src; img.alt = en.type || 'lietadlo';
+    tile.insertBefore(img, tile.firstChild);
+    requestAnimationFrame(() => requestAnimationFrame(() => { img.classList.add('on'); if(old) old.classList.remove('on'); }));
+    setTimeout(() => { if(old) old.remove(); }, 1200);
+    tile.setAttribute('data-id', en.id);
+    const cap = tile.querySelector('.m-cap'); if(cap) cap.innerHTML = mosaicCaption(en);
+    const oldBadge = tile.querySelector('.m-rar'); if(oldBadge) oldBadge.remove();
+    const b = mosaicRarBadge(en); if(b) tile.insertAdjacentHTML('afterbegin', b);
+    mosaicSlots[slot] = en;
+  };
+  pre.src = en.photos[0].url;
+}
+function startMosaicTimer(){
+  clearInterval(mosaicTimer);
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  mosaicTimer = setInterval(() => {
+    if(document.hidden || currentView !== 'gallery' || !$('lightbox').classList.contains('hidden') || $('mosaicWrap').classList.contains('hidden')) return;
+    mosaicTick++;
+    if(mosaicTick % 8 === 0) renderMosaic(true);
+    else swapMosaicTile(Math.floor(Math.random() * mosaicSlots.length));
+  }, 4500);
+}
+$('mosaic').addEventListener('click', (e) => {
+  const t = e.target.closest('.m-tile');
+  if(!t) return;
+  const entry = state.entries.find(en => en.id === t.getAttribute('data-id'));
+  if(entry) openLightbox(entry, 'photo', 0);
+});
+$('mosaicShuffle').addEventListener('click', () => { renderMosaic(true); mosaicTick = 0; });
 
 /* ---------- lightbox ---------- */
 function openLightbox(entry, mode, photoIndex){
