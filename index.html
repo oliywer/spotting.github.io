@@ -40,7 +40,7 @@ body{
   min-height:100vh;
   padding: 32px 18px 60px;
 }
-.board{ max-width: 960px; margin: 0 auto; }
+.board{ max-width: 1360px; margin: 0 auto; }
 
 .board__header{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:8px; }
 .board__title{ display:flex; align-items:center; gap:10px; }
@@ -73,6 +73,7 @@ body{
 .form-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:14px; }
 .field{ display:flex; flex-direction:column; gap:6px; }
 .field.hidden{ display:none; }
+#loginPanel .form-grid{ align-items:end; }
 .field label{ font-size:12.5px; color:var(--ink-soft); font-family:var(--font-body); font-weight:600; }
 .field input, .field select, .field textarea{ background: var(--surface-alt); border:1px solid var(--border); color: var(--ink); font-family: var(--font-body); font-size:14px; padding:10px 12px; border-radius:9px; }
 .field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-soft); }
@@ -208,6 +209,7 @@ body{
 .mosaic-shuffle:hover{ background:#fff; }
 .mosaic.swap{ animation: mfade .5s ease; }
 @keyframes mfade{ from{ opacity:0; transform: scale(.985); } to{ opacity:1; transform:none; } }
+@media (min-width:1100px){ .mosaic{ grid-auto-rows: 190px; gap:12px; } }
 @media (max-width:640px){
   .mosaic{ grid-template-columns: repeat(2, 1fr); grid-auto-rows: 118px; gap:8px; }
   .m-tile{ border-radius:14px; }
@@ -326,7 +328,7 @@ body{
   <div id="loginPanel" class="panel hidden">
     <div class="auth-tabs"><span id="tabLogin" class="active">Prihlásenie</span><span id="tabRegister">Registrácia</span></div>
     <div class="form-grid">
-      <div class="field hidden" id="nameField"><label>Prezývka (2–24 znakov, bez @, vidia ju všetci)</label><input type="text" id="l_name" maxlength="24" autocomplete="nickname"></div>
+      <div class="field hidden" id="nameField"><label>Prezývka</label><input type="text" id="l_name" maxlength="24" autocomplete="nickname" placeholder="2–24 znakov, bez @, vidia ju všetci"></div>
       <div class="field"><label id="l_idLabel">Email alebo prezývka</label><input type="text" id="l_email" autocomplete="username" autocapitalize="none"></div>
       <div class="field"><label>Heslo</label><input type="password" id="l_password" autocomplete="current-password"></div>
       <div class="field hidden" id="pass2Field"><label>Heslo znova</label><input type="password" id="l_password2" autocomplete="new-password"></div>
