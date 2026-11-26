@@ -188,6 +188,19 @@ body{
 .lightbox__close{ position:absolute; top:12px; right:12px; z-index:3; width:32px; height:32px; border-radius:50%; background: rgba(255,255,255,0.92); color: var(--ink); border:none; font-size:15px; cursor:pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .lightbox__close:hover{ background: #fff; }
 
+.req{ color: var(--danger); font-weight:700; }
+.hint{ color: var(--muted); font-weight:400; font-size:11.5px; }
+.form-note{ margin:-8px 0 14px !important; font-size:12.5px !important; color: var(--muted) !important; }
+.opt-section{ margin-top:22px; padding-top:18px; border-top:1px dashed var(--border); }
+.opt-title{ font-family: var(--font-display); font-weight:600; font-size:14px; color: var(--ink); margin-bottom:10px; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:4px; }
+.chips:empty{ display:none; }
+.chip{ font-family: var(--font-body); font-size:12.5px; font-weight:600; background: var(--primary-soft); color: var(--primary-dark); border:none; border-radius:20px; padding:7px 14px; cursor:pointer; }
+.chip:hover{ background:#C7DDFC; }
+.opt.hidden{ display:none; }
+.opt .opt-x{ background:none; border:none; color: var(--muted); cursor:pointer; font-size:11px; padding:0 0 0 6px; }
+.opt .opt-x:hover{ color: var(--danger); }
+.opt-section .form-grid{ margin-top:12px; }
 .tabs{ display:flex; gap:6px; margin-bottom:18px; border-bottom:1px solid var(--border); }
 .tab{ font-family: var(--font-body); font-size:14px; font-weight:600; color: var(--ink-soft); background:none; border:none; padding:10px 16px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
 .tab:hover{ color: var(--ink); }
@@ -293,46 +306,51 @@ body{
 
   <div id="formPanel" class="panel hidden">
     <h2 id="formTitle">NOVÉ POZOROVANIE</h2>
+    <p class="form-note"><span class="req">*</span> povinné údaje</p>
     <div class="form-grid">
-      <div class="field"><label>Dátum</label><input type="date" id="f_date"></div>
-      <div class="field"><label>Čas</label><input type="time" id="f_time"></div>
-      <div class="field">
-        <label>Lokalita spottingu</label>
-        <input type="text" id="f_location" list="locationOptions" placeholder="napr. Chmelnica" autocomplete="off">
-        <datalist id="locationOptions"></datalist>
-      </div>
-      <div class="field"><label>Kategória</label>
-        <select id="f_category">
-          <option value="commercial">Komerčné</option>
-          <option value="cargo">Nákladné</option>
-          <option value="military">Vojenské</option>
-          <option value="ga">Všeobecné letectvo</option>
-          <option value="other">Iné</option>
-        </select>
-      </div>
-      <div class="field"><label>Registrácia</label><input type="text" id="f_reg" placeholder="OK-ABC"></div>
-      <div class="field">
-        <label>Typ lietadla</label>
-        <input type="text" id="f_type" placeholder="Boeing 737, Airbus A320...">
-      </div>
-      <div class="field"><label>Dopravca / prevádzkovateľ</label><input type="text" id="f_operator"></div>
-      <div class="field"><label>Číslo letu</label><input type="text" id="f_flightno" placeholder="WZZ145"></div>
-      <div class="field"><label>Trasa</label><input type="text" id="f_route" placeholder="LZKZ → EGLL"></div>
-      <div class="field field--wide"><label>Poznámky</label><textarea id="f_notes" placeholder="svetlo, uhol, čokoľvek zaujímavé..."></textarea></div>
+      <div class="field"><label>Registrácia lietadla <span class="req">*</span></label><input type="text" id="f_reg" placeholder="napr. OK-ABC" maxlength="12"></div>
+      <div class="field"><label>Typ lietadla <span class="req">*</span></label><input type="text" id="f_type" placeholder="Boeing 737, Airbus A320..."></div>
+      <div class="field"><label>Dátum <span class="req">*</span></label><input type="date" id="f_date"></div>
       <div class="field field--wide">
-        <label>Fotografie (viac uhlov toho istého preletu)</label>
+        <label>Fotografie <span class="req">*</span> <span class="hint">(aspoň jedna; viac uhlov toho istého preletu)</span></label>
         <div id="photoRows" class="photo-rows"></div>
-        <button type="button" id="btnAddPhoto" class="btn btn--ghost btn--small">+ Pridať fotku</button>
+        <button type="button" id="btnAddPhoto" class="btn btn--ghost btn--small">+ Pridať ďalšiu fotku</button>
       </div>
-      <div class="field field--wide">
-        <label>FlightRadar screenshot (voliteľné)</label>
-        <div class="photo-row" id="frRow">
-          <img id="f_frshot_preview" style="display:none;">
-          <label class="file-btn">
-            Vybrať screenshot
-            <input type="file" id="f_frshot" accept="image/*" class="file-input-hidden">
-          </label>
-          <button type="button" id="btnRemoveFrShot" class="photo-row__remove hidden">✕</button>
+    </div>
+
+    <div class="opt-section">
+      <div class="opt-title">Doplňujúce údaje <span class="hint">(voliteľné, vyber čo chceš pridať)</span></div>
+      <div id="optChips" class="chips"></div>
+      <div class="form-grid">
+        <div class="field opt hidden" data-opt="time"><label>Čas <button type="button" class="opt-x" data-opt-remove="time">✕</button></label><input type="time" id="f_time"></div>
+        <div class="field opt hidden" data-opt="location">
+          <label>Lokalita spottingu <button type="button" class="opt-x" data-opt-remove="location">✕</button></label>
+          <input type="text" id="f_location" list="locationOptions" placeholder="napr. Chmelnica" autocomplete="off">
+          <datalist id="locationOptions"></datalist>
+        </div>
+        <div class="field opt hidden" data-opt="category"><label>Kategória <button type="button" class="opt-x" data-opt-remove="category">✕</button></label>
+          <select id="f_category">
+            <option value="commercial">Komerčné</option>
+            <option value="cargo">Nákladné</option>
+            <option value="military">Vojenské</option>
+            <option value="ga">Všeobecné letectvo</option>
+            <option value="other">Iné</option>
+          </select>
+        </div>
+        <div class="field opt hidden" data-opt="operator"><label>Dopravca / prevádzkovateľ <button type="button" class="opt-x" data-opt-remove="operator">✕</button></label><input type="text" id="f_operator"></div>
+        <div class="field opt hidden" data-opt="flightno"><label>Číslo letu <button type="button" class="opt-x" data-opt-remove="flightno">✕</button></label><input type="text" id="f_flightno" placeholder="WZZ145"></div>
+        <div class="field opt hidden" data-opt="route"><label>Trasa <button type="button" class="opt-x" data-opt-remove="route">✕</button></label><input type="text" id="f_route" placeholder="LZKZ → EGLL"></div>
+        <div class="field field--wide opt hidden" data-opt="notes"><label>Poznámky <button type="button" class="opt-x" data-opt-remove="notes">✕</button></label><textarea id="f_notes" placeholder="svetlo, uhol, čokoľvek zaujímavé..."></textarea></div>
+        <div class="field field--wide opt hidden" data-opt="fr">
+          <label>FlightRadar screenshot <button type="button" class="opt-x" data-opt-remove="fr">✕</button></label>
+          <div class="photo-row" id="frRow">
+            <img id="f_frshot_preview" style="display:none;">
+            <label class="file-btn">
+              Vybrať screenshot
+              <input type="file" id="f_frshot" accept="image/*" class="file-input-hidden">
+            </label>
+            <button type="button" id="btnRemoveFrShot" class="photo-row__remove hidden">✕</button>
+          </div>
         </div>
       </div>
     </div>
@@ -586,6 +604,35 @@ $('btnRemoveFrShot').addEventListener('click', () => {
 });
 
 /* ---------- submission form open/close ---------- */
+const OPT_LABELS = { time:'Čas', location:'Lokalita', category:'Kategória', operator:'Dopravca', flightno:'Číslo letu', route:'Trasa', notes:'Poznámky', fr:'FlightRadar screenshot' };
+const OPT_INPUT = { time:'f_time', location:'f_location', category:'f_category', operator:'f_operator', flightno:'f_flightno', route:'f_route', notes:'f_notes' };
+function renderChips(){
+  $('optChips').innerHTML = Object.keys(OPT_LABELS)
+    .filter(k => document.querySelector(`[data-opt="${k}"]`).classList.contains('hidden'))
+    .map(k => `<button type="button" class="chip" data-chip="${k}">+ ${OPT_LABELS[k]}</button>`).join('');
+}
+function showOpt(key, show){
+  document.querySelector(`[data-opt="${key}"]`).classList.toggle('hidden', !show);
+  renderChips();
+}
+function clearOpt(key){
+  if(key === 'fr'){ $('btnRemoveFrShot').click(); }
+  else if(key === 'category'){ $('f_category').value = 'commercial'; }
+  else { $(OPT_INPUT[key]).value = ''; }
+  showOpt(key, false);
+}
+$('optChips').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-chip]');
+  if(!c) return;
+  const key = c.getAttribute('data-chip');
+  showOpt(key, true);
+  if(OPT_INPUT[key]) $(OPT_INPUT[key]).focus();
+});
+document.querySelector('.opt-section').addEventListener('click', (e) => {
+  const x = e.target.closest('[data-opt-remove]');
+  if(x) clearOpt(x.getAttribute('data-opt-remove'));
+});
+
 function resetForm(){
   ['f_date','f_time','f_location','f_reg','f_type','f_operator','f_flightno','f_route','f_notes'].forEach(id => $(id).value = '');
   $('f_category').value = 'commercial';
@@ -600,6 +647,8 @@ function resetForm(){
   $('f_frshot').value = '';
   $('f_frshot_preview').style.display = 'none';
   $('btnRemoveFrShot').classList.add('hidden');
+  Object.keys(OPT_LABELS).forEach(k => document.querySelector(`[data-opt="${k}"]`).classList.add('hidden'));
+  renderChips();
   editingId = null;
   $('formTitle').textContent = 'NOVÉ POZOROVANIE';
   $('btnSave').textContent = 'Pridať pozorovanie';
@@ -628,6 +677,9 @@ function openEditForm(entry){
     $('f_frshot_preview').style.display = 'block';
     $('btnRemoveFrShot').classList.remove('hidden');
   }
+  const has = { time:entry.time, location:entry.location, category:(entry.category && entry.category !== 'commercial'), operator:entry.operator, flightno:entry.flightNo, route:entry.route, notes:entry.notes, fr:entry.frShotUrl };
+  Object.keys(has).forEach(k => document.querySelector(`[data-opt="${k}"]`).classList.toggle('hidden', !has[k]));
+  renderChips();
   $('formPanel').classList.remove('hidden');
   $('f_date').focus();
 }
@@ -743,10 +795,12 @@ async function submitEdit(reg, type){
 $('btnSave').addEventListener('click', async () => {
   const reg = $('f_reg').value.trim();
   const type = $('f_type').value.trim();
-  if(!reg && !type){ toast('Zadaj aspoň registráciu alebo typ lietadla.'); return; }
+  if(!reg){ toast('Zadaj registráciu lietadla.'); $('f_reg').focus(); return; }
+  if(!type){ toast('Zadaj typ lietadla.'); $('f_type').focus(); return; }
+  if(!$('f_date').value){ toast('Zadaj dátum.'); $('f_date').focus(); return; }
+  if(!currentPhotos.some(p => p.blob) && existingPhotos.length === 0){ toast('Pridaj aspoň jednu fotku.'); return; }
 
   if(!editingId && !currentUser){ toast('Najprv sa prihlás.'); return; }
-  if(!editingId && !currentPhotos.some(p => p.blob)){ toast('Pridaj aspoň jednu fotku.'); return; }
   $('btnSave').disabled = true;
   toast(editingId ? 'Ukladám zmeny...' : 'Odosielam...', 4000);
   try{
